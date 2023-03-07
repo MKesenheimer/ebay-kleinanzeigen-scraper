@@ -8,6 +8,7 @@ import os
 import datetime
 import re
 from enum import Enum
+import statistics
 try: 
     from BeautifulSoup import BeautifulSoup
 except ImportError:
@@ -16,8 +17,8 @@ except ImportError:
 __prog_name__ = 'ebay-Kleinanzeigen Scraper'
 __version__ = 0.1
 
-#outputdir="./"
-outputdir="/mnt/volumes/usb/ebay-kleinanzeigen-data/"
+outputdir="./"
+#outputdir="/mnt/volumes/usb/ebay-kleinanzeigen-data/"
 
 def log(message):
     now = datetime.datetime.now()
@@ -75,12 +76,13 @@ def collect(cfg):
     return status, header, item_lst
 
 def analyze(cfg, item_lst):
-    header = ["term", "min price", "max price", "number of items", "average price"]
-    average = 0
-    for item in item_lst:
-        average += int(item[-1]) # extract price
-    average /= len(item_lst)
-    data = [cfg.sterm, str(cfg.minprice), str(cfg.maxprice), str(len(item_lst)), str(round(average))]
+    header = ["term", "search min price", "search max price", "number of items", "lowest price", "highest price", "average price"]
+    prices = list(map(lambda x: int(x[-1]), item_lst))
+    #print(prices)
+    average = statistics.mean(prices)
+    lowest = min(prices)
+    highest = max(prices)
+    data = [cfg.sterm, str(cfg.minprice), str(cfg.maxprice), str(len(item_lst)), str(lowest), str(highest), str(round(average))]
     return Status.SUCCESS, header, data
 
 def main():
