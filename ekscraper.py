@@ -76,13 +76,13 @@ def collect(cfg):
     return status, header, item_lst
 
 def analyze(cfg, item_lst):
-    header = ["term", "search min price", "search max price", "number of items", "lowest price", "highest price", "average price"]
+    header = ["time", "term", "search min price", "search max price", "number of items", "lowest price", "highest price", "average price"]
     prices = list(map(lambda x: int(x[-1]), item_lst))
     #print(prices)
     average = statistics.mean(prices)
     lowest = min(prices)
     highest = max(prices)
-    data = [cfg.sterm, str(cfg.minprice), str(cfg.maxprice), str(len(item_lst)), str(lowest), str(highest), str(round(average))]
+    data = [now.strftime("%Y-%m-%d %H:%M:%S"), cfg.sterm, str(cfg.minprice), str(cfg.maxprice), str(len(item_lst)), str(lowest), str(highest), str(round(average))]
     return Status.SUCCESS, header, data
 
 def main():
