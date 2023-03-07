@@ -82,6 +82,7 @@ def analyze(cfg, item_lst):
     average = statistics.mean(prices)
     lowest = min(prices)
     highest = max(prices)
+    now = datetime.datetime.now()
     data = [now.strftime("%Y-%m-%d %H:%M:%S"), cfg.sterm, str(cfg.minprice), str(cfg.maxprice), str(len(item_lst)), str(lowest), str(highest), str(round(average))]
     return Status.SUCCESS, header, data
 
