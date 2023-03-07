@@ -2,14 +2,24 @@
 
 outputdir=/mnt/volumes/usb/ebay-kleinanzeigen-data/
 
-pid=$(cat ${outputdir}/process.id)
-echo "Killing process with PID $pid..."
-kill -9 $pid
+for pidfile in $(ls ${outputdir}/*.id); do
+  pid=$(cat $pidfile)
+  echo "Killing process with PID $pid..."
+  kill -9 $pid
+done
 
 echo "Restarting data collector..."
-nohup ./run.sh > ${outputdir}/output.log 2> ${outputdir}/error.log &
-sleep 10
+for runfile in $(ls run*.sh); do
+  fname=$(basename -- $runfile)
+  fname="${fname%.*}" 
+  echo "Starting $runfile"
+  nohup ./$runfile > ${outputdir}/output-$fname.log 2> ${outputdir}/error-$fname.log &
+  sleep 10
+done
 
-pid=$(cat ${outputdir}/process.id)
-echo "New PID is $pid."
+for pidfile in $(ls ${outputdir}/*.id); do
+  pid=$(cat $pidfile)
+  echo "New PID is $pid."
+done
+
 echo "Done."
