@@ -124,7 +124,9 @@ def main():
     cfg.prog_name = __prog_name__
 
     log("Collecting data...")
-    
+    filename = outputdir + "data-" + '_'.join(cfg.sterm.lower().split()) + ".csv"
+    log("Writing data to file {}.".format(filename))
+
     #print(data)
     prevStatus = Status.SUCCESS
     while True:
@@ -139,15 +141,15 @@ def main():
         
             status, header, data = analyze(cfg, item_lst)
             # write data to file
-            if os.path.isfile(outputdir + "data.csv"):
-                f = open(outputdir + "data.csv", 'a')
+            if os.path.isfile(filename):
+                f = open(filename, 'a')
                 f.write(",".join(data))
                 f.write("\n")
                 f.close()
 
             # if the file does not exist, create one and write the headers of the table to the first line
             else:
-                f = open(outputdir + "data.csv", 'w')
+                f = open(filename, 'w')
                 f.write("# ")
                 f.write(",".join(header))
                 f.write("\n")
