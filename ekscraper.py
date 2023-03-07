@@ -16,8 +16,8 @@ except ImportError:
 __prog_name__ = 'ebay-Kleinanzeigen Scraper'
 __version__ = 0.1
 
-outputdir="./"
-#outputdir="/mnt/volumes/usb/ebay-kleinanzeigen-data/"
+#outputdir="./"
+outputdir="/mnt/volumes/usb/ebay-kleinanzeigen-data/"
 
 def log(message):
     now = datetime.datetime.now()
