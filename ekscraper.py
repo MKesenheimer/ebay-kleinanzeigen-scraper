@@ -154,7 +154,7 @@ def main():
             # if the file does not exist, create one and write the headers of the table to the first line
             else:
                 f = open(filename, 'w')
-                f.write("# ")
+                #f.write("# ")
                 f.write(",".join(header))
                 f.write("\n")
                 f.write(",".join(data))
