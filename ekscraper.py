@@ -26,7 +26,7 @@ def log(message):
     message = date_time + message
     print(message)
     # write message to file
-    f = open(outputdir+"collection.log", 'a')
+    f = open(outputdir + "collection.log", 'a')
     f.write(message)
     f.write("\n")
     f.close()
@@ -86,10 +86,6 @@ def analyze(cfg, item_lst):
     return Status.SUCCESS, header, data
 
 def main():
-    pid = os.getpid()
-    with open(outputdir + "process.id", "w") as pidfile:  
-        pidfile.write("{}".format(pid))
-
     parser = argparse.ArgumentParser(description='%s version %.2f' % (__prog_name__, __version__))
     parser.add_argument('-s', '--search-term',
         action='store',
@@ -124,6 +120,11 @@ def main():
 
     cfg = parser.parse_args()
     cfg.prog_name = __prog_name__
+
+    pid = os.getpid()
+    filename = outputdir + "process-" + '_'.join(cfg.sterm.lower().split()) + ".id"
+    with open(filename, "w") as pidfile:  
+        pidfile.write("{}".format(pid))
 
     log("Collecting data...")
     filename = outputdir + "data-" + '_'.join(cfg.sterm.lower().split()) + ".csv"
