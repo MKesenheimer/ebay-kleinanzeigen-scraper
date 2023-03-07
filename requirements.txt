@@ -1,1 +1,2 @@
-BeautifulSoup
+beautifulsoup4
+soupsieve
