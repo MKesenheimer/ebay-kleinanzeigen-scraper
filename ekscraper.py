@@ -41,6 +41,7 @@ def collect(cfg):
     log("Searching for: {}".format(term))
     minpreis = cfg.minprice
     maxpreis = cfg.maxprice
+    exclude  = cfg.exclude
 
     url = "https://www.ebay-kleinanzeigen.de:443/s-preis:{}:{}/{}/k0".format(minpreis, maxpreis, term)
     headers = {"GET /s-preis": "{}:{}/{}/k0 HTTP/2".format(minpreis, maxpreis, term), "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 "}
@@ -67,7 +68,7 @@ def collect(cfg):
             position = ' '.join(item.find("div", class_="aditem-main--top--left").text.split())
             date = ' '.join(item.find("div", class_="aditem-main--top--right").text.split())
             
-            if ("SUCHE" not in title.upper()) and ("SUCHE" not in descr.upper()):
+            if ("SUCHE" not in title.upper()) and ("SUCHE" not in descr.upper()) and (exclude not in title.upper() and (exclude not in descr.upper()):
                 item_lst.append([title, descr, position, date, url,  price])
         except:
             status = Status.FAIL
@@ -93,6 +94,13 @@ def main():
         metavar='<term>',
         dest='sterm',
         help='The term to search for.',
+        default='')
+
+    parser.add_argument('-e', '--exclude',
+        action='store',
+        metavar='<exclude>',
+        dest='exclude',
+        help='The term to exclude.',
         default='')
 
     parser.add_argument('-l', '--min-price',
