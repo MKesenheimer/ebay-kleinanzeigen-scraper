@@ -70,13 +70,13 @@ def collect(cfg):
 
             check = True
             for exclude in exclude_lst:
-                print(exclude)
+                #print(exclude)
                 check = check and (exclude.upper() not in title.upper()) and (exclude.upper() not in descr.upper())
-                print(check)
+                #print(check)
             
             if ("SUCHE" not in title.upper()) and ("SUCHE" not in descr.upper()) and check:
                 item_lst.append([title, descr, position, date, url,  price])
-                print(title)
+                #print(title)
         except:
             status = Status.FAIL
             log("Warning: parsing failed.")
