@@ -13,6 +13,6 @@ do
   else
     echo "Ok."
   fi
-  sleep 10
+  sleep 86400
 done
 
