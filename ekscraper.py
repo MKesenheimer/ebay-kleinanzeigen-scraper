@@ -32,6 +32,7 @@ def log(message):
     f.close()
 
 class Status(Enum):
+    WARN    = 3,
     ERROR   = 2,
     FAIL    = 1,
     SUCCESS = 0
@@ -50,23 +51,25 @@ def collect(cfg):
     except:
       return Status.ERROR, [], []
 
-    #print(r.text)
-    parsed_html = BeautifulSoup(r.text, "html.parser")
+    #print(r.text.encode('utf-8', 'ignore'))
+    #parsed_html = BeautifulSoup(r.text, "html.parser")
+    parsed_html = BeautifulSoup(r.text.encode('utf-8', 'ignore'), "html.parser")
     results = parsed_html.body.find_all('div', attrs={'class':'aditem-main'})
-
+    
     status = Status.SUCCESS
     item_lst = []
     for item in results:
         try:
+            #print(item)
             ellipsis = item.find("a", class_="ellipsis", href=True)
             url = "https://www.ebay-kleinanzeigen.de" + ellipsis['href']
-            title = ellipsis.text
-            
+            title = ellipsis.text.encode('utf-8', 'ignore')
+
             price = item.find("p", class_="aditem-main--middle--price-shipping--price").text.strip().encode("ascii", "ignore").decode("ascii").strip()
             price = re.findall('[0-9.]+',price)[0]
-            descr = item.find("p", class_="aditem-main--middle--description").text
-            position = ' '.join(item.find("div", class_="aditem-main--top--left").text.split())
-            date = ' '.join(item.find("div", class_="aditem-main--top--right").text.split())
+            descr = item.find("p", class_="aditem-main--middle--description").text.encode('utf-8', 'ignore')
+            position = ' '.join(item.find("div", class_="aditem-main--top--left").text.encode('utf-8', 'ignore').split())
+            date = ' '.join(item.find("div", class_="aditem-main--top--right").text.encode('utf-8', 'ignore').split())
 
             check = True
             for exclude in exclude_lst:
@@ -77,8 +80,10 @@ def collect(cfg):
             if ("SUCHE" not in title.upper()) and ("SUCHE" not in descr.upper()) and check:
                 item_lst.append([title, descr, position, date, url,  price])
                 #print(title)
-        except:
-            status = Status.FAIL
+        except Exception as e:
+            log("exception occured:")
+            log(str(e))
+            status = Status.WARN
             log("Warning: parsing failed.")
     header = ["title", "description", "place", "date", "url", "price"]
     return status, header, item_lst

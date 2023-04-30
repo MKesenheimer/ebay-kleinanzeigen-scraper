@@ -14,7 +14,7 @@ for runfile in $(ls run*.sh); do
   fname="${fname%.*}" 
   echo "Starting $runfile"
   nohup ./$runfile > ${outputdir}/output-$fname.log 2> ${outputdir}/error-$fname.log &
-  sleep 10
+  sleep 2
 done
 
 for pidfile in $(ls ${outputdir}/*.id); do
