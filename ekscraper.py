@@ -15,7 +15,7 @@ except ImportError:
     from bs4 import BeautifulSoup
 
 __prog_name__ = 'ebay-Kleinanzeigen Scraper'
-__version__ = 0.1
+__version__ = 0.2
 
 #outputdir="./"
 outputdir="/mnt/volumes/usb/ebay-kleinanzeigen-data/"
@@ -85,6 +85,10 @@ def collect(cfg):
             log(str(e))
             status = Status.WARN
             log("Warning: parsing failed.")
+            pass
+
+    log("Number of results: {}".format(len(results)))
+    log("Number of extracted items: {}".format(len(item_lst)))
     header = ["title", "description", "place", "date", "url", "price"]
     return status, header, item_lst
 
