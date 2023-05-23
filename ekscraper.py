@@ -44,7 +44,7 @@ def collect(cfg):
     maxpreis = cfg.maxprice
     exclude_lst = cfg.exclude
 
-    url = "https://www.ebay-kleinanzeigen.de:443/s-preis:{}:{}/{}/k0".format(minpreis, maxpreis, term)
+    url = "https://www.kleinanzeigen.de:443/s-preis:{}:{}/{}/k0".format(minpreis, maxpreis, term)
     headers = {"GET /s-preis": "{}:{}/{}/k0 HTTP/2".format(minpreis, maxpreis, term), "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 "}
     try:
       r = requests.get(url, headers=headers)
@@ -96,7 +96,9 @@ def analyze(cfg, item_lst):
     header = ["time", "term", "search min price", "search max price", "number of items", "lowest price", "highest price", "average price"]
     prices = list(map(lambda x: int(x[-1]), item_lst))
     #print(prices)
-    average = statistics.mean(prices)
+    average = prices[0]
+    if len(prices) > 1:
+        average = statistics.mean(prices)
     lowest = min(prices)
     highest = max(prices)
     now = datetime.datetime.now()
