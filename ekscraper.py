@@ -32,6 +32,7 @@ def log(message):
     f.close()
 
 class Status(Enum):
+    NODATA  = 4,
     WARN    = 3,
     ERROR   = 2,
     FAIL    = 1,
@@ -96,14 +97,23 @@ def analyze(cfg, item_lst):
     header = ["time", "term", "search min price", "search max price", "number of items", "lowest price", "highest price", "average price"]
     prices = list(map(lambda x: int(x[-1]), item_lst))
     #print(prices)
-    average = prices[0]
+    average = 0
+    lowest = 0
+    highest = 0
+    status = Status.NODATA
+    if len(prices) == 1:
+        average = prices[0]
+        lowest = average
+        highest = average
+        status = Status.SUCCESS
     if len(prices) > 1:
         average = statistics.mean(prices)
-    lowest = min(prices)
-    highest = max(prices)
+        lowest = min(prices)
+        highest = max(prices)
+        status = Status.SUCCESS
     now = datetime.datetime.now()
     data = [now.strftime("%Y-%m-%d %H:%M:%S"), cfg.sterm, str(cfg.minprice), str(cfg.maxprice), str(len(item_lst)), str(lowest), str(highest), str(round(average))]
-    return Status.SUCCESS, header, data
+    return status, header, data
 
 def main():
     parser = argparse.ArgumentParser(description='%s version %.2f' % (__prog_name__, __version__))
@@ -171,22 +181,23 @@ def main():
                 log("Continuing collecting data.")
         
             status, header, data = analyze(cfg, item_lst)
-            # write data to file
-            if os.path.isfile(filename):
-                f = open(filename, 'a')
-                f.write(",".join(data))
-                f.write("\n")
-                f.close()
+            if status == Status.SUCCESS:
+                # write data to file
+                if os.path.isfile(filename):
+                    f = open(filename, 'a')
+                    f.write(",".join(data))
+                    f.write("\n")
+                    f.close()
 
-            # if the file does not exist, create one and write the headers of the table to the first line
-            else:
-                f = open(filename, 'w')
-                #f.write("# ")
-                f.write(",".join(header))
-                f.write("\n")
-                f.write(",".join(data))
-                f.write("\n")
-                f.close()
+                # if the file does not exist, create one and write the headers of the table to the first line
+                else:
+                    f = open(filename, 'w')
+                    #f.write("# ")
+                    f.write(",".join(header))
+                    f.write("\n")
+                    f.write(",".join(data))
+                    f.write("\n")
+                    f.close()
 
             time.sleep(cfg.intervall)
 

@@ -1,0 +1,1632 @@
+[
+    {
+        "id": "779ed1ef.54df68",
+        "type": "tab",
+        "label": "ebay-kleinanzeigen",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "d219845e.dfb14",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-kirby_return_to_dreamland.csv",
+        "recursive": "",
+        "x": 300,
+        "y": 140,
+        "wires": [
+            [
+                "92143676.1447a"
+            ]
+        ]
+    },
+    {
+        "id": "92143676.1447a",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-kirby_return_to_dreamland.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 140,
+        "wires": [
+            [
+                "af58af1b.e18db8"
+            ]
+        ]
+    },
+    {
+        "id": "af58af1b.e18db8",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 200,
+        "wires": [
+            [
+                "8fbcf59b.6de16"
+            ]
+        ]
+    },
+    {
+        "id": "8d1fca45.b960d",
+        "type": "inject",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 980,
+        "y": 1320,
+        "wires": [
+            [
+                "92143676.1447a",
+                "21346455.d7dc4c",
+                "8450c10a.930df8",
+                "55319487.8d6a34",
+                "251c91ce.44f10e",
+                "895f1596.4f6718",
+                "77d2df66.37e5d8",
+                "58c25678.9d70d",
+                "eebf3476.7b7778",
+                "d149ab2.637b5d8",
+                "a9234ef0.59a42",
+                "ad7e7d9b.7a922",
+                "9952adf9.b7564"
+            ]
+        ]
+    },
+    {
+        "id": "8fbcf59b.6de16",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 200,
+        "wires": [
+            [
+                "d9bc24cb.e32b98",
+                "d5051ecc.a2e928"
+            ],
+            [
+                "d5051ecc.a2e928"
+            ]
+        ]
+    },
+    {
+        "id": "d9bc24cb.e32b98",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "d37dcea9.be7cf",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Kirby Return to Dreamland",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 740,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d5051ecc.a2e928",
+        "type": "debug",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "583ace6c.b87808",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-captain_toad_switch.csv",
+        "recursive": "",
+        "x": 300,
+        "y": 300,
+        "wires": [
+            [
+                "21346455.d7dc4c"
+            ]
+        ]
+    },
+    {
+        "id": "21346455.d7dc4c",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-captain_toad_switch.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 300,
+        "wires": [
+            [
+                "c389fcbb.82f41"
+            ]
+        ]
+    },
+    {
+        "id": "cf22b1a4.30404",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 360,
+        "wires": [
+            [
+                "c90699ea.d93c9"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c389fcbb.82f41",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 360,
+        "wires": [
+            [
+                "cf22b1a4.30404"
+            ]
+        ]
+    },
+    {
+        "id": "c90699ea.d93c9",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "ed9618b6.08a088",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Captain Toad",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 690,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ff7f0b85.06f718",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-switch_pro_controller.csv",
+        "recursive": "",
+        "x": 300,
+        "y": 440,
+        "wires": [
+            [
+                "8450c10a.930df8"
+            ]
+        ]
+    },
+    {
+        "id": "8450c10a.930df8",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-switch_pro_controller.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 440,
+        "wires": [
+            [
+                "b1e22b6c.01493"
+            ]
+        ]
+    },
+    {
+        "id": "87a466ce.e0cac",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 500,
+        "wires": [
+            [
+                "389fc27.8245bbe"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "b1e22b6c.01493",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 500,
+        "wires": [
+            [
+                "87a466ce.e0cac"
+            ]
+        ]
+    },
+    {
+        "id": "389fc27.8245bbe",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "d37dcea9.be7cf",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Switch Pro Controller",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 720,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e44631f0.bf438",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-yoshis_crafted_world.csv",
+        "recursive": "",
+        "x": 300,
+        "y": 580,
+        "wires": [
+            [
+                "55319487.8d6a34"
+            ]
+        ]
+    },
+    {
+        "id": "404fc10d.50508",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 640,
+        "wires": [
+            [
+                "61a29108.c1f26"
+            ]
+        ]
+    },
+    {
+        "id": "61a29108.c1f26",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 640,
+        "wires": [
+            [
+                "6f7a7f52.ed46c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "55319487.8d6a34",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-yoshis_crafted_world.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 580,
+        "wires": [
+            [
+                "404fc10d.50508"
+            ]
+        ]
+    },
+    {
+        "id": "6f7a7f52.ed46c",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "ed9618b6.08a088",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Yoshis crafted World",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 720,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d70b0d19.e64138",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-super_mario_odyssey.csv",
+        "recursive": "",
+        "x": 310,
+        "y": 720,
+        "wires": [
+            [
+                "251c91ce.44f10e"
+            ]
+        ]
+    },
+    {
+        "id": "14fa2ed1.32ecf1",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 780,
+        "wires": [
+            [
+                "ce6880f6.a87d28"
+            ]
+        ]
+    },
+    {
+        "id": "ce6880f6.a87d28",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 780,
+        "wires": [
+            [
+                "d329fb21.c11258"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "251c91ce.44f10e",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-super_mario_odyssey.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 720,
+        "wires": [
+            [
+                "14fa2ed1.32ecf1"
+            ]
+        ]
+    },
+    {
+        "id": "d329fb21.c11258",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "d37dcea9.be7cf",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Super Mario Odyssey",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 720,
+        "y": 780,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4b2b7c22.c8586c",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-raspberry_pi_zero.csv",
+        "recursive": "",
+        "x": 290,
+        "y": 860,
+        "wires": [
+            [
+                "895f1596.4f6718"
+            ]
+        ]
+    },
+    {
+        "id": "b1d270f3.713448",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 920,
+        "wires": [
+            [
+                "a45b55bf.f389c"
+            ]
+        ]
+    },
+    {
+        "id": "a45b55bf.f389c",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 920,
+        "wires": [
+            [
+                "4fb8fc5.8de2f84"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "895f1596.4f6718",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-raspberry_pi_zero.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 860,
+        "wires": [
+            [
+                "b1d270f3.713448"
+            ]
+        ]
+    },
+    {
+        "id": "4fb8fc5.8de2f84",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "ed9618b6.08a088",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Raspberry Pi Zero",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 710,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "773519.a9d18ae8",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-apple_airpods_pro_1.csv",
+        "recursive": "",
+        "x": 300,
+        "y": 1000,
+        "wires": [
+            [
+                "77d2df66.37e5d8"
+            ]
+        ]
+    },
+    {
+        "id": "84a8e630.3cea88",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 1060,
+        "wires": [
+            [
+                "f60ed081.134f1"
+            ]
+        ]
+    },
+    {
+        "id": "f60ed081.134f1",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 1060,
+        "wires": [
+            [
+                "66e97041.865a28"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "77d2df66.37e5d8",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-apple_airpods_pro_1.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 1000,
+        "wires": [
+            [
+                "84a8e630.3cea88"
+            ]
+        ]
+    },
+    {
+        "id": "66e97041.865a28",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "d37dcea9.be7cf",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Apple Airpods Pro 1. Generation",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "80",
+        "ymax": "160",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 750,
+        "y": 1060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ac89faa0.f31e5",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-cult_of_the_lamb_switch.csv",
+        "recursive": "",
+        "x": 310,
+        "y": 1140,
+        "wires": [
+            [
+                "58c25678.9d70d"
+            ]
+        ]
+    },
+    {
+        "id": "55b4010c.42a89",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 1200,
+        "wires": [
+            [
+                "38ada72a.1f436"
+            ]
+        ]
+    },
+    {
+        "id": "38ada72a.1f436",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 1200,
+        "wires": [
+            [
+                "44158b86.a2888c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "58c25678.9d70d",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-cult_of_the_lamb_switch.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 1140,
+        "wires": [
+            [
+                "55b4010c.42a89"
+            ]
+        ]
+    },
+    {
+        "id": "44158b86.a2888c",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "ed9618b6.08a088",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Cult of the lamb Nintendo Switch",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 760,
+        "y": 1200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3b5a22a3.f0b32e",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-super_mario_deluxe.csv",
+        "recursive": "",
+        "x": 300,
+        "y": 1280,
+        "wires": [
+            [
+                "eebf3476.7b7778"
+            ]
+        ]
+    },
+    {
+        "id": "a269e56f.930838",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 1340,
+        "wires": [
+            [
+                "d8a2b67f.c6f75"
+            ]
+        ]
+    },
+    {
+        "id": "d8a2b67f.c6f75",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 1340,
+        "wires": [
+            [
+                "48517081.7cc2d8"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "eebf3476.7b7778",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-super_mario_deluxe.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 1280,
+        "wires": [
+            [
+                "a269e56f.930838"
+            ]
+        ]
+    },
+    {
+        "id": "48517081.7cc2d8",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "d37dcea9.be7cf",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Super Mario Deluxe",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 720,
+        "y": 1340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b651f800.19353",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-pokemon_arceus.csv",
+        "recursive": "",
+        "x": 270,
+        "y": 1420,
+        "wires": [
+            [
+                "d149ab2.637b5d8"
+            ]
+        ]
+    },
+    {
+        "id": "b1c15732.56c77",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 330,
+        "y": 1480,
+        "wires": [
+            [
+                "cd19c0ab.3a9238"
+            ]
+        ]
+    },
+    {
+        "id": "cd19c0ab.3a9238",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 490,
+        "y": 1480,
+        "wires": [
+            [
+                "71d9faa2.8c80cc"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d149ab2.637b5d8",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-pokemon_arceus.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 660,
+        "y": 1420,
+        "wires": [
+            [
+                "b1c15732.56c77"
+            ]
+        ]
+    },
+    {
+        "id": "71d9faa2.8c80cc",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "ed9618b6.08a088",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Pokemon Arceus",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 690,
+        "y": 1480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ec9ede57.4c4f48",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-super_mario_maker_2.csv",
+        "recursive": "",
+        "x": 310,
+        "y": 1560,
+        "wires": [
+            [
+                "a9234ef0.59a42"
+            ]
+        ]
+    },
+    {
+        "id": "2e394fe2.1fe738",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 1620,
+        "wires": [
+            [
+                "d905f650.07aee"
+            ]
+        ]
+    },
+    {
+        "id": "d905f650.07aee",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 1620,
+        "wires": [
+            [
+                "d5f36bdf.3ab1a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "a9234ef0.59a42",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-super_mario_maker_2.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 1560,
+        "wires": [
+            [
+                "2e394fe2.1fe738"
+            ]
+        ]
+    },
+    {
+        "id": "d5f36bdf.3ab1a",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "d37dcea9.be7cf",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Super Mario Maker 2",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 720,
+        "y": 1620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "24a3c030.6e0cc",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-animal_crossing.csv",
+        "recursive": "",
+        "x": 290,
+        "y": 1700,
+        "wires": [
+            [
+                "ad7e7d9b.7a922"
+            ]
+        ]
+    },
+    {
+        "id": "ac7dafe2.c417c8",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 1760,
+        "wires": [
+            [
+                "9ef4f891.29c0c"
+            ]
+        ]
+    },
+    {
+        "id": "9ef4f891.29c0c",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 1760,
+        "wires": [
+            [
+                "3707725c.ba5af6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "ad7e7d9b.7a922",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-animal_crossing.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 1700,
+        "wires": [
+            [
+                "ac7dafe2.c417c8"
+            ]
+        ]
+    },
+    {
+        "id": "3707725c.ba5af6",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "ed9618b6.08a088",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Animal Crossing",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "60",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 700,
+        "y": 1760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b4708aa8.da696",
+        "type": "watch",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "files": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-tears_of_the_kingdom.csv",
+        "recursive": "",
+        "x": 310,
+        "y": 1840,
+        "wires": [
+            [
+                "9952adf9.b7564"
+            ]
+        ]
+    },
+    {
+        "id": "42ef6446.b1b124",
+        "type": "csv",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": false,
+        "include_null_values": false,
+        "x": 350,
+        "y": 1900,
+        "wires": [
+            [
+                "65b6e34.845a09c"
+            ]
+        ]
+    },
+    {
+        "id": "65b6e34.845a09c",
+        "type": "function",
+        "z": "779ed1ef.54df68",
+        "name": "build graph",
+        "func": "var payload = msg.payload;\ndebugmsg = msg;\n//var debug = [];\n\n// prices\nvar pavg = [];\nvar pmin = [];\nvar pmax = [];\n\nvar maxvalues = 672; // 28d * 24h = 672 data points per week\nvar min = Math.max(0, payload.length - maxvalues);\n//debug.push({\"min\": min, \"maxvalues\": maxvalues, \"payload.length\": payload.length});\n\nfor (let i = min; i < payload.length; i++) {\n  var timestamp = Date.parse(payload[i][\"time\"]);\n  var avgprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"average price\"])};\n  pavg.push(avgprice);\n  var minprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"lowest price\"])};\n  pmin.push(minprice);\n  var maxprice = {\"x\":timestamp, \"y\":parseInt(payload[i][\"highest price\"])};\n  pmax.push(maxprice);\n}\n\nvar msg1 = {payload:\"\"};\nmsg1.payload = [{\"series\":[\"average\", \"min\", \"max\"], \n                \"data\":[pavg, pmin, pmax], \n                \"labels\": \"average\"}];\n//var debugmsg = {payload:debug};\n\nreturn [msg1, debugmsg];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 510,
+        "y": 1900,
+        "wires": [
+            [
+                "7cb55a81.831d2c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "9952adf9.b7564",
+        "type": "file in",
+        "z": "779ed1ef.54df68",
+        "name": "input file",
+        "filename": "/mnt/volumes/usb/ebay-kleinanzeigen-data/data-tears_of_the_kingdom.csv",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 680,
+        "y": 1840,
+        "wires": [
+            [
+                "42ef6446.b1b124"
+            ]
+        ]
+    },
+    {
+        "id": "7cb55a81.831d2c",
+        "type": "ui_chart",
+        "z": "779ed1ef.54df68",
+        "name": "",
+        "group": "d37dcea9.be7cf",
+        "order": 1,
+        "width": "10",
+        "height": "6",
+        "label": "Zelda Tears of the Kingdom",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "dd HH:mm",
+        "interpolate": "step",
+        "nodata": "",
+        "dot": false,
+        "ymin": "20",
+        "ymax": "100",
+        "removeOlder": "28",
+        "removeOlderPoints": "672",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#f94144",
+            "#f3722c",
+            "#f8961e",
+            "#f9844a",
+            "#f9c74f",
+            "#90be6d",
+            "#43aa8b",
+            "#4d908e",
+            "#577590"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "x": 740,
+        "y": 1900,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d37dcea9.be7cf",
+        "type": "ui_group",
+        "name": "Spalte 1",
+        "tab": "6f940f18.fa7e",
+        "order": 1,
+        "disp": false,
+        "width": "10",
+        "collapse": false
+    },
+    {
+        "id": "ed9618b6.08a088",
+        "type": "ui_group",
+        "name": "Spalte 2",
+        "tab": "6f940f18.fa7e",
+        "order": 2,
+        "disp": false,
+        "width": "10",
+        "collapse": false
+    },
+    {
+        "id": "6f940f18.fa7e",
+        "type": "ui_tab",
+        "name": "ebay-kleinanzeigen",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
