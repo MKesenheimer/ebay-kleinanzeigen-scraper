@@ -65,20 +65,26 @@ def collect(cfg):
             ellipsis = item.find("a", class_="ellipsis", href=True)
             url = "https://www.ebay-kleinanzeigen.de" + ellipsis['href']
             title = ellipsis.text.encode('utf-8', 'ignore')
+            #print(title)
 
             price = item.find("p", class_="aditem-main--middle--price-shipping--price").text.strip().encode("ascii", "ignore").decode("ascii").strip()
             price = re.findall('[0-9.]+',price)[0]
+            #print(price)
             descr = item.find("p", class_="aditem-main--middle--description").text.encode('utf-8', 'ignore')
-            position = ' '.join(item.find("div", class_="aditem-main--top--left").text.encode('utf-8', 'ignore').split())
-            date = ' '.join(item.find("div", class_="aditem-main--top--right").text.encode('utf-8', 'ignore').split())
+            #print(descr)
+            position = b' '.join(item.find("div", class_="aditem-main--top--left").text.encode('utf-8', 'ignore').split())
+            #print(position)
+            date = b' '.join(item.find("div", class_="aditem-main--top--right").text.encode('utf-8', 'ignore').split())
+            #print(date)
 
             check = True
             for exclude in exclude_lst:
+                exclude = exclude.encode('utf-8', 'ignore')
                 #print(exclude)
                 check = check and (exclude.upper() not in title.upper()) and (exclude.upper() not in descr.upper())
                 #print(check)
             
-            if ("SUCHE" not in title.upper()) and ("SUCHE" not in descr.upper()) and check:
+            if (b"SUCHE" not in title.upper()) and (b"SUCHE" not in descr.upper()) and check:
                 item_lst.append([title, descr, position, date, url,  price])
                 #print(title)
         except Exception as e:
